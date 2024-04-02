@@ -665,7 +665,7 @@ chr2	annotathon2024	CDS	9224141	9224350	.	-	0	gene_id=g6564; transcript_id=g6564
 chr2	annotathon2024	CDS	9224414	9228153	.	-	2	gene_id=g6564; transcript_id=g6564.t1; ID=cds-50784; Parent=g6564.t1; gene_name=MYH6;
 chr2	annotathon2024	CDS	9228196	9228400	.	-	0	gene_id=g6564; transcript_id=g6564.t1; ID=cds-50786; Parent=g6564.t1; gene_name=MYH6;
 chr2	annotathon2024	five_prime_UTR	9228401	9228541	0.89	-	.	gene_id=g6564; transcript_id=g6564.t1; ID=five_prime_UTR-3191; Parent=g6564.t1; tss_type=nosl; gene_name=MYH6;
-chr2	annotathon2024	three_prime_UTR	9221880	9222108				gene_id=g6564; transcript_id=g6564.t1; Parent=g6564.t1; gene_name=MYH6;
+chr2	annotathon2024	three_prime_UTR	9221880	9222108	.	-	.	gene_id=g6564; transcript_id=g6564.t1; Parent=g6564.t1; gene_name=MYH6;
 XSR	annotathon2024	gene	580921	586863	0.43	+	.	gene_id=g13423; transcript_id=g13423.t1; ID=g13423; gene_name=MYH8-12;
 XSR	annotathon2024	transcript	580921	586863	0.43	+	.	gene_id=g13423; transcript_id=g13423.t1; ID=g13423.t1; Parent=g13423; gene_name=MYH8-12;
 XSR	annotathon2024	exon	580921	581814	.	+	.	gene_id=g13423; transcript_id=g13423.t1; Parent=g13423.t1; gene_name=MYH8-12;
