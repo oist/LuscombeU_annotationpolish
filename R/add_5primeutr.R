@@ -22,10 +22,16 @@
 #' @examples
 #' # Assuming `annotation_gr` is your GRanges object with transcript, gene, and exon annotations,
 #' # and `cage_peaks` is another GRanges object with CAGE peak data:
+#' annotation_gr <- system.file("extdata", "OKI.I69_v2_minimized.gff3", package="annotationpolish") |> rtracklayer::import()
+#' cage_peaks <- read_cage("https://raw.githubusercontent.com/oist/LuscombeU-CAGE_libraries/main/2021-12-17_Okinawa_Oik/CrossAlignments/consensus_clusters_no_OKItoOKI.bed", "https://raw.githubusercontent.com/oist/LuscombeU-CAGE_libraries/main/2021-12-17_Okinawa_Oik/CrossAlignments/consensus_clusters_sl_OKItoOKI.bed" )
 #' updated_annotations <- add_five_prime_utr(annotation_gr, cage_peaks, dist = 500)
 #'
 #' # This will return a GRanges object with adjusted annotations and added five prime UTRs.
 add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
+
+  # dist should be minus 1
+  dist <- dist - 1
+
   # add unique ID for manipulation
   annotation_gr <- add_unique_id(annotation_gr)
 
@@ -40,6 +46,7 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   # get the closest one upstream within 500bp
   nearest_upstream_peak <- plyranges::join_nearest_downstream(cage_peaks, atx_tss, distance = T) |> plyranges::filter(distance <= dist)
 
+  # start or end does not matter because it is a 1bp range
   nearest_upstream_peak_df <- nearest_upstream_peak |> dplyr::as_tibble() |> dplyr::select(tss = start, tss_type, transcript_id, distance)
 
   nearest_upstream_peak_df <- nearest_upstream_peak_df |> group_by(transcript_id) |> filter(distance == min(distance))
@@ -48,13 +55,11 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   transcripts <- annotation_gr |> tibble::as_tibble() |> dplyr::filter(type == "transcript") |> dplyr::right_join(nearest_upstream_peak_df)
 
   # create 5' UTR by adjusting transcript models
-  five_prime_utr <- transcripts |>
-    dplyr::mutate(end = dplyr::case_when(strand == "+" ~ start - 1, T ~ end),
-                  start = dplyr::case_when(strand == "+" ~ tss, T ~ start)) |>
-    dplyr::mutate(start = dplyr::case_when(strand == "-" ~ end + 1, T ~ start),
-                  end = dplyr::case_when(strand == "-" ~ tss, T ~ end)) |>
+  five_prime_utr <- transcripts |> mutate(temp_start = start, temp_end = end) |>
+    dplyr::mutate(end = dplyr::case_when(strand == "+" ~ temp_start - 1, T ~ tss),
+                  start = dplyr::case_when(strand == "+" ~ tss, T ~ temp_end + 1)) |>
     dplyr::mutate(type = "five_prime_UTR", source = "CAGE", score = NA) |>
-    dplyr::select(-tss)
+    dplyr::select(-tss, -temp_start, -temp_end)
 
   # adjust transcripts
   transcripts <- transcripts |> dplyr::mutate(start = dplyr::case_when(strand == "+" ~ tss, T ~ start),
