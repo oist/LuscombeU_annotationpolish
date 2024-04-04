@@ -180,6 +180,9 @@ summarize_operons <- function(operonic_genes){
 #' cage_peaks <- read_cage("https://raw.githubusercontent.com/oist/LuscombeU-CAGE_libraries/main/2021-12-17_Okinawa_Oik/CrossAlignments/consensus_clusters_no_OKItoOKI.bed", "https://raw.githubusercontent.com/oist/LuscombeU-CAGE_libraries/main/2021-12-17_Okinawa_Oik/CrossAlignments/consensus_clusters_sl_OKItoOKI.bed" )
 #' make_operons(annotation_gr |> filter(type == "gene"), window = 500, cage_peaks |> filter(tss_type == "nosl"))
 make_operons <- function(genes, window = 500, cage){
+  if (FALSE %in% (genes$type == "gene")) {
+    stop("non-genes attributes found!")
+  }
   operons_unsplit <- calcOperons(genes, window)
   operonic_genes <- split_operons_assign_genes(operons_unsplit, genes, cage)
   operon_summary <- summarize_operons(operonic_genes)
