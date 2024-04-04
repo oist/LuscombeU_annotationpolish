@@ -32,11 +32,6 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   # dist should be minus 1
   dist <- dist - 1
 
-  # When there are both SL and non-SL CAGE peaks at the same coordinate for one
-  # transcript, pick the non-SL peak
-  cage_peaks <- cage_peaks[-subjectHits(findOverlaps(cage_peaks |> filter(tss_type == "nosl"),
-                                                     cage_peaks |> filter(tss_type == "sl")))]
-
   # add unique ID for manipulation
   annotation_gr <- add_unique_id(annotation_gr)
 
@@ -47,6 +42,11 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
 
   # get the max peak
   GenomicRanges::ranges(cage_peaks) <- cage_peaks$thick
+
+  # When there are both SL and non-SL CAGE peaks at the same coordinate for one
+  # transcript, pick the non-SL peak
+  cage_peaks <- cage_peaks[-subjectHits(findOverlaps(cage_peaks |> filter(tss_type == "nosl"),
+                                                     cage_peaks |> filter(tss_type == "sl")))]
 
   # get the closest one upstream within 500bp
   nearest_upstream_peak <- plyranges::join_nearest_downstream(cage_peaks, atx_tss, distance = T) |> plyranges::filter(distance <= dist)
