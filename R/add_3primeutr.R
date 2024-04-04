@@ -18,16 +18,16 @@
 #' # Scan for the "AATAAA" motif and its reverse complement in the human genome
 #' motif_occurrences <- scan_motif(genome, motif = "AATAAA")
 #' print(motif_occurrences)
-scan_motif <- function(genome, motif = "AATAAA"){
+scan_motif <- function(genome, motif = "AATAAA", ...){
   # Define the motif and its reverse complement
   motif_revcomp <- reverseComplement(DNAString(motif))
 
   # Function to search for the motif in both directions on a given chromosome
   search_motif_both_strands <- function(chromosome) {
     # Search for motif in the forward direction
-    forward_matches <- matchPattern(motif, genome[[chromosome]])
+    forward_matches <- matchPattern(motif, genome[[chromosome]], ...)
     # Search for motif in the reverse direction (reverse complement)
-    reverse_matches <- matchPattern(motif_revcomp, genome[[chromosome]])
+    reverse_matches <- matchPattern(motif_revcomp, genome[[chromosome]], ...)
 
     # Check if there are no matches in both directions
     if (length(forward_matches) == 0 && length(reverse_matches) == 0) {
