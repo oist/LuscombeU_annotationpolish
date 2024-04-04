@@ -208,8 +208,13 @@ add_three_prime_utr <- function(annotation_gr, utr_motif_gr, dist = 500){
     select(seqnames, start, end, width, strand, source, type, score, phase, gene_id, transcript_id, Parent) |>
     makeGRangesFromDataFrame(keep.extra.columns = T)
 
+  # get those genes without detectable 3' UTR
+  noutrgenes <- annotation_gr |> plyranges::filter(!transcript_id %in% granges_with_3utr$transcript_id)
+  noutrgenes <- annotation_gr |> filter(gene_id %in% unique(noutrgenes$gene_id))
+
   # combine eveerything and sort
-  final_gr <- c(granges_with_3utr, annotation_gr |> plyranges::filter(!transcript_id %in% granges_with_3utr$transcript_id)) |>
+  final_gr <- c(granges_with_3utr,
+                noutrgenes) |>
     plyranges::select(-ID) |>
     sort()
 
@@ -232,5 +237,30 @@ add_three_prime_utr <- function(annotation_gr, utr_motif_gr, dist = 500){
 
 
 
+
+
+#' Extend 3' UTRs to Nearest Downstream Motif
+#'
+#' This function extends the 3' untranslated regions (UTRs) of transcripts in a given genomic annotation to the nearest downstream instance of a specified motif, within a maximum specified distance. It first scans the provided genome for occurrences of the motif to create a set of potential UTR extension points. Then, it adjusts the transcript models in the annotation, extending the 3' UTRs to these points where applicable.
+#'
+#' @param annotation_gr A `GRanges` object containing the genomic annotations, typically including transcripts for which 3' UTRs need to be extended. This object should be the result of importing genomic annotation data, such as from a GFF3 file.
+#' @param genome A `BSgenome` object representing the genome to be scanned for the specified motif. This object is expected to encapsulate the entire genomic sequence for the organism of interest, facilitating the search for motif occurrences.
+#' @param motif A character string representing the DNA sequence motif to search for within the genome as potential 3' UTR extension points. Default is "AATAAA", a common polyadenylation signal motif.
+#' @param dist An integer specifying the maximum distance (in base pairs) to search downstream of each transcript's 3' end for the motif. The function will only consider motifs within this distance for extending the 3' UTR. Default value is 500 bp.
+#'
+#' @return The original `GRanges` object (annotation_gr) with modified transcript models, where 3' UTRs have been potentially extended to the nearest downstream motif within the specified distance. The function does not explicitly return the object; ensure to capture the result into a variable.
+#'
+#' @export
+#'
+#' @examples
+#' # Assuming 'annotation_gr' is loaded from a GFF3 file and 'BSgenome.Oidioi.OIST.OKI2018.I69' is loaded
+#' updated_annotations <- add_three_prime_utr_wrapper(annotation_gr, BSgenome.Oidioi.OIST.OKI2018.I69, motif = "AATAAA", dist = 500)
+#' # 'updated_annotations' now contains transcripts with potentially extended 3' UTRs.
+add_three_prime_utr_wrapper <- function(annotation_gr, genome, motif = "AATAAA", dist = 500){
+
+  utr_motif_gr <- scan_motif(genome, motif)
+  add_three_prime_utr(annotation_gr, utr_motif_gr)
+
+}
 
 
