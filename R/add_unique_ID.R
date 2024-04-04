@@ -51,28 +51,46 @@ check_unique_ids <- function(gr) {
 #' after processing.
 #'
 #' @export
+#' @import GenomicRanges
+#' @import tidyverse
+#' @import plyranges
 #'
 #' @examples
 #' # Assuming you have a GRanges object `gr` with the necessary columns
 #' gr <- add_unique_id(gr)
 #' # `gr` now includes an 'ID' column with unique identifiers for each entry.
 add_unique_id <- function(gr) {
-  gr$ID <- NA_character_
-  gr$ID[gr$type == "gene"] <- as.character(gr$gene_id[gr$type == "gene"])
-  gr$ID[gr$type == "transcript"] <- as.character(gr$transcript_id[gr$type == "transcript"])
+  # gr$ID <- NA_character_
+  # gr$ID[gr$type == "gene"] <- as.character(gr$gene_id[gr$type == "gene"])
+  # gr$ID[gr$type == "transcript"] <- as.character(gr$transcript_id[gr$type == "transcript"])
+  #
+  # other_types <- (gr$type |> levels())[!(gr$type |> levels()) %in% c("gene", "transcript")]
+  # for (type in other_types) {
+  #   indices <- which(gr$type == type)
+  #   if (length(indices) > 0) {
+  #     for (idx in indices) {
+  #       transcript_id <- gr$transcript_id[idx]
+  #       same_transcript_features <- which(gr$transcript_id == transcript_id & gr$type == type)
+  #       number <- match(idx, same_transcript_features)
+  #       gr$ID[idx] <- paste(type, transcript_id, number, sep = "_")
+  #     }
+  #   }
+  # }
 
-  other_types <- (gr$type |> levels())[!(gr$type |> levels()) %in% c("gene", "transcript")]
-  for (type in other_types) {
-    indices <- which(gr$type == type)
-    if (length(indices) > 0) {
-      for (idx in indices) {
-        transcript_id <- gr$transcript_id[idx]
-        same_transcript_features <- which(gr$transcript_id == transcript_id & gr$type == type)
-        number <- match(idx, same_transcript_features)
-        gr$ID[idx] <- paste(type, transcript_id, number, sep = "_")
-      }
-    }
+  add_id <- function(gr){
+    gr |> as_tibble() |> group_by(transcript_id, type) |> mutate(ID = paste(type, transcript_id, row_number(), sep = "_")) |>
+      ungroup() |>
+      mutate(ID = case_when(type == "gene" ~ NA, type == "transcript" ~ transcript_id, T ~ ID)) |>
+      makeGRangesFromDataFrame(keep.extra.columns = T)
   }
+
+  gr_sense <- gr |> filter(strand == "+") |> sort() |> add_id()
+  gr_antisense <- gr |> filter(strand == "-") |> sort(decreasing = T) |> add_id()
+
+  gr <- c(gr_sense, gr_antisense) |> sort()
+
+  # add ID for gene
+  gr$ID[gr$type == "gene"] <- as.character(gr$gene_id[gr$type == "gene"])
 
   # Check if IDs are unique after assignment
   check_unique_ids(gr)
