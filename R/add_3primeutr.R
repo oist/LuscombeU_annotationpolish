@@ -8,6 +8,8 @@
 #' @return A `GRanges` object containing the genomic locations of all occurrences of the specified motif and its reverse complement. Each location is annotated with the chromosome (seqnames), start and end positions (ranges), and the strand ("+" for the forward strand and "-" for the reverse strand) on which the motif occurs.
 #'
 #' @export
+#' @import Biostrings
+#' @import GenomicRanges
 #'
 #' @examples
 #' # Load the BSgenome object for a specific organism (Example: Okinawa O. dioica)
@@ -77,6 +79,7 @@ scan_motif <- function(genome, motif = "AATAAA"){
 #' the regions extend upstream and downstream from the feature's start.
 #'
 #' @export
+#' @import IRanges
 #'
 #' @examples
 #' library(GenomicRanges)
@@ -170,12 +173,12 @@ add_three_prime_utr <- function(annotation_gr, utr_motif_gr, dist = 500){
     dplyr::mutate(type = "three_prime_UTR", source = "genome", score = NA) |>
     dplyr::select(-txend, -temp_start, -temp_end)
 
-  # adjust transcripts maybe wrong
+  # adjust transcripts
   transcripts <- transcripts |> dplyr::mutate(start = dplyr::case_when(strand == "-" ~ txend, T ~ start),
                                               end = dplyr::case_when(strand == "+" ~ txend, T ~ end)) |>
     dplyr::select(-txend)
 
-  # adjust genes
+  # adjust genes based on min max of each gene
   genes <- right_join(annotation_gr |> as_tibble() |> select(-start, -end) |> filter(type == "gene"),
                       transcripts |> group_by(gene_id) |> mutate(start = min(start), end = max(end)) |>
                         select(start, end) |> distinct())
@@ -205,18 +208,29 @@ add_three_prime_utr <- function(annotation_gr, utr_motif_gr, dist = 500){
 
   # combine everything together again
   granges_with_3utr <- bind_rows(transcripts, genes, three_prime_utr, all_features) |>
-    select(seqnames, start, end, width, strand, source, type, score, phase, gene_id, transcript_id, Parent) |>
+    select(seqnames, start, end, width, strand, source, type, score, phase, gene_id, transcript_id, Parent, tss_type) |>
     makeGRangesFromDataFrame(keep.extra.columns = T)
 
   # get those genes without detectable 3' UTR
+  # when there are isoforms with 3' UTR, remove it from the noutrgenes
   noutrgenes <- annotation_gr |> plyranges::filter(!transcript_id %in% granges_with_3utr$transcript_id)
-  noutrgenes <- annotation_gr |> filter(gene_id %in% unique(noutrgenes$gene_id))
+  noutrgenes <- annotation_gr |> filter(gene_id %in% unique(noutrgenes$gene_id)) |>
+    filter(!transcript_id %in% granges_with_3utr$transcript_id)
 
   # combine eveerything and sort
   final_gr <- c(granges_with_3utr,
                 noutrgenes) |>
     plyranges::select(-ID) |>
     sort()
+
+  # remove all gene entries and add again
+  final_gr <- c(final_gr |> filter(type != "gene"), annotation_gr |> filter(type == "gene"))
+
+  # fix genes again by adjusting the start and ends
+  final_gr <- bind_rows(
+    final_gr |> as_tibble() |> group_by(gene_id) |> mutate(start = min(start), end = max(end)) |> filter(type == "gene"),
+    final_gr |> as_tibble() |> filter(type != "gene")
+  ) |> makeGRangesFromDataFrame(keep.extra.columns = T) |> sort()
 
   # unlist Parent and remove_transcript_id if gene
   mcols(final_gr)$Parent <- sapply(mcols(final_gr)$Parent, function(x) {
