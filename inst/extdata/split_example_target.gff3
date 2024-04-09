@@ -1,0 +1,15 @@
+chr2	genome	three_prime_UTR	14331519	14331700	.	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	exon	14331519	14331791	.	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	gene	14331519	14339427	0.67	-	.	gene_id=g8043;
+chr2	AUGUSTUS	transcript	14331519	14339427	0.67	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043;
+chr2	AUGUSTUS	CDS	14331701	14331791	.	-	1	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	exon	14332109	14332313	1	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	CDS	14332109	14332313	.	-	2	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	exon	14334065	14334769	1	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	CDS	14334065	14334769	.	-	2	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	exon	14338833	14338908	1	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	CDS	14338833	14338908	.	-	0	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	exon	14339036	14339154	1	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	CDS	14339036	14339154	.	-	2	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	exon	14339346	14339427	0.67	-	.	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
+chr2	AUGUSTUS	CDS	14339346	14339427	.	-	0	gene_id=g8043;transcript_id=g8043.t1;Parent=g8043.t1;
