@@ -26,7 +26,7 @@ fix_liftoff_oikobase <- function(gr){
     mutate(gene_id = case_when(type == "gene" ~ stringr::str_replace(gene_id, "GSOIDT", "GSOIDG"))) |>
     mutate(transcript_id = case_when(type == "transcript" ~ stringr::str_replace(transcript_id, "GSOIDG", "GSOIDT"))) |>
     # select important columns
-    select(1:10, valid_ORFs, Parent, valid_ORF, gene_id, transcript_id) |>
+    select(1:10, coverage, Parent, valid_ORF, gene_id, transcript_id) |>
     # assign ID
     mutate(ID = case_when(type == "gene" ~ ID |> stringr::str_replace("GSOIDT", "GSOIDG"), T ~ stringr::str_replace(ID, "GSOIDG", "GSOIDT")))
 

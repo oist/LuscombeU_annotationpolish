@@ -1,12 +1,13 @@
-#' Title
+#' Process Genomic Annotations with CAGE Peaks and Gene Size Filtering
 #'
-#' This function processes genomic annotations by splitting genes based on their overlap with provided CAGE peaks and filtering based on gene size. It is designed to integrate new gene models from a 'liftoff' annotation with an original annotation, prioritizing genes that intersect with CAGE peaks and are above a minimum size threshold.
+#' This function refines gene annotations by integrating 'liftoff' gene models with existing annotations, utilizing CAGE peak data to identify and split genes, and filtering genes based on size and optionally the presence of an ORF. It prioritizes genes that intersect with CAGE peaks and meet a size threshold, supporting the identification of potentially novel or modified gene models.
 #'
 #' @param original_annotation A GenomicRanges object containing the original gene annotations.
 #' @param liftoff A GenomicRanges object with 'liftoff' gene models to be integrated into the original annotation.
 #' @param cage_peaks A GenomicRanges object containing CAGE peaks used for identifying genes to be split.
 #' @param min_gene_size Integer, minimum gene size (in base pairs) for a gene to be retained. Default is 1000 bp.
 #' @param remove_no_ORF Logical, indicating whether to remove liftoff gene models without a valid ORF. Default is FALSE.
+#' @param cov_threshold Numeric value setting the minimum coverage threshold for 'liftoff' gene models. Used to filter out low-confidence models before integration. Default is 0.5.
 #'
 #' @return A GenomicRanges object containing the modified gene annotations, with some genes split or replaced based on the overlap with CAGE peaks and the size threshold.
 #' @export
@@ -18,10 +19,14 @@
 #' liftoff <- system.file("extdata", "split_example_liftoff.gff3", package="annotationpolish") |> rtracklayer::import() |> fix_liftoff_oikobase()
 #'
 #' split_transcript(original_annotation, liftoff, cage_peaks)
-split_transcript <- function(original_annotation, liftoff, cage_peaks, min_gene_size = 1000, remove_no_ORF = F){
+split_transcript <- function(original_annotation, liftoff, cage_peaks, min_gene_size = 1000, remove_no_ORF = F, cov_threshold = 0.5){
 
   # Remove genes smaller than the min_gene_size threshold from the original annotation
   old_annotation <- original_annotation |> filter(gene_id %in% (original_annotation |> filter(type == "gene") |> filter(width >= 1000) %>% .$gene_id))
+
+  # filter liftoff based on coverage
+  liftoff_coverage_genes <- (liftoff |> mutate(coverage = as.numeric(coverage)) |> filter(coverage > cov_threshold) )$gene_id |> unique()
+  liftoff <- liftoff |> filter(gene_id %in% liftoff_coverage_genes)
 
   # remove liftoff gene models if filtering is TRUE
   # if remove_no_ORF = T

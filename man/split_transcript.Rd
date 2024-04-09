@@ -2,14 +2,15 @@
 % Please edit documentation in R/split_transcript.R
 \name{split_transcript}
 \alias{split_transcript}
-\title{Title}
+\title{Process Genomic Annotations with CAGE Peaks and Gene Size Filtering}
 \usage{
 split_transcript(
   original_annotation,
   liftoff,
   cage_peaks,
   min_gene_size = 1000,
-  remove_no_ORF = F
+  remove_no_ORF = F,
+  cov_threshold = 0.5
 )
 }
 \arguments{
@@ -22,12 +23,14 @@ split_transcript(
 \item{min_gene_size}{Integer, minimum gene size (in base pairs) for a gene to be retained. Default is 1000 bp.}
 
 \item{remove_no_ORF}{Logical, indicating whether to remove liftoff gene models without a valid ORF. Default is FALSE.}
+
+\item{cov_threshold}{Numeric value setting the minimum coverage threshold for 'liftoff' gene models. Used to filter out low-confidence models before integration. Default is 0.5.}
 }
 \value{
 A GenomicRanges object containing the modified gene annotations, with some genes split or replaced based on the overlap with CAGE peaks and the size threshold.
 }
 \description{
-This function processes genomic annotations by splitting genes based on their overlap with provided CAGE peaks and filtering based on gene size. It is designed to integrate new gene models from a 'liftoff' annotation with an original annotation, prioritizing genes that intersect with CAGE peaks and are above a minimum size threshold.
+This function refines gene annotations by integrating 'liftoff' gene models with existing annotations, utilizing CAGE peak data to identify and split genes, and filtering genes based on size and optionally the presence of an ORF. It prioritizes genes that intersect with CAGE peaks and meet a size threshold, supporting the identification of potentially novel or modified gene models.
 }
 \examples{
 cage_peaks <- read_cage("https://raw.githubusercontent.com/oist/LuscombeU-CAGE_libraries/main/2021-12-17_Okinawa_Oik/CrossAlignments/consensus_clusters_no_OKItoOKI.bed", "https://raw.githubusercontent.com/oist/LuscombeU-CAGE_libraries/main/2021-12-17_Okinawa_Oik/CrossAlignments/consensus_clusters_sl_OKItoOKI.bed" )
