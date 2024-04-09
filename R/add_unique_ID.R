@@ -84,8 +84,17 @@ add_unique_id <- function(gr) {
       makeGRangesFromDataFrame(keep.extra.columns = T)
   }
 
-  gr_sense <- gr |> filter(strand == "+") |> sort() |> add_id()
-  gr_antisense <- gr |> filter(strand == "-") |> sort(decreasing = T) |> add_id()
+  if (length(gr |> filter(strand == "+")) > 0) {
+    gr_sense <- gr |> filter(strand == "+") |> sort() |> add_id()
+  }else{
+    gr_sense <- gr |> filter(strand == "+") |> sort()
+  }
+
+  if (length(gr |> filter(strand == "-")) > 0) {
+    gr_antisense <- gr |> filter(strand == "-") |> sort() |> add_id()
+  }else{
+    gr_antisense <- gr |> filter(strand == "-") |> sort()
+  }
 
   gr <- c(gr_sense, gr_antisense) |> sort()
 
