@@ -25,8 +25,10 @@ split_transcript <- function(original_annotation, liftoff, cage_peaks, min_gene_
 
   # remove liftoff gene models if filtering is TRUE
   # if remove_no_ORF = T
-  liftoff_orf_genes <- (liftoff |> filter(valid_ORF == "True"))$gene_id |> unique()
-  liftoff <- liftoff |> filter(gene_id %in% liftoff_orf_genes)
+  if (remove_no_ORF == T) {
+    liftoff_orf_genes <- (liftoff |> filter(valid_ORF == "True"))$gene_id |> unique()
+    liftoff <- liftoff |> filter(gene_id %in% liftoff_orf_genes)
+  }
 
   # Remove liftoff gene models that do not intersect with the original annotation
   liftoff_annot_overlaps <- plyranges::join_overlap_intersect(liftoff |> filter(type == "gene"),
