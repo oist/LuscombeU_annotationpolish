@@ -4,7 +4,7 @@
 \alias{scan_motif}
 \title{Scan for Motif Occurrences in a Genome}
 \usage{
-scan_motif(genome, motif = "AATAAA")
+scan_motif(genome, motif = "AATAAA", ...)
 }
 \arguments{
 \item{genome}{A \code{BSgenome} object representing the genome to be scanned. This object should be loaded and passed to the function. The genome object must be from the \code{BSgenome} package, which provides comprehensive genomic sequences for various organisms.}
