@@ -20,7 +20,7 @@ This function imports manual annotation data from a specified GFF3 file. It proc
 the annotations to select specific fields, including 'source', 'type', 'score', 'phase',
 'Name', 'gene_name', 'gene_id', 'transcript_id', 'Parent', and optionally 'tss_type',
 if present. The 'ID' field is explicitly removed to clean the annotation data for further
-analysis.
+analysis. Terminal exon and gene/transcript boundaries are adjusted based on the terminal features.
 }
 \examples{
 # Load and clean manual annotation data

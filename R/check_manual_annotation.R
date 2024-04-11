@@ -83,18 +83,21 @@ check_overlaps <- function(annot_gr){
     message("No exon overlaps")
   }else{
     output_list$exons <- exons_overlaps
+    message(paste("check exons of ", paste(unique(exons_overlaps$transcript_id), collapse = ", "), "!!!"))
   }
 
   if (length(fiveutr_overlaps) == 0 ) {
     message("No 5' UTR overlapping CDS")
   }else{
     output_list$fiveutr_overlaps <- fiveutr_overlaps
+    message(paste("check 5' UTR of ", paste(unique(fiveutr_overlaps$transcript_id), collapse = ", "), "!!!"))
   }
 
   if (length(threeutr_overlaps) == 0 ) {
     message("No 3' UTR overlapping CDS")
   }else{
     output_list$threeutr_overlaps <- threeutr_overlaps
+    message(paste("check 3' UTR of ", paste(unique(threeutr_overlaps$transcript_id), collapse = ", "), "!!!"))
   }
 
 
