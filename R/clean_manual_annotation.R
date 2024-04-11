@@ -21,7 +21,7 @@
 #'
 clean_manual_anno <- function(file) {
   # Import the annotation file
-  anno <- rtracklayer::import(file)
+  anno <- rtracklayer::import.gff3(file)
 
   # Determine if 'tss_type' is present in the data
   all_fields <- names(GenomicRanges::mcols(anno))
