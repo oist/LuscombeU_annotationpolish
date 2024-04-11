@@ -124,7 +124,8 @@ adjust_terminal_exons <- function(gr){
     mutate(start = case_when(is_terminal_start == T ~ min(start), T ~ start),
            end = case_when(is_terminal_end == T ~ max(end), T ~ end))
 
-  models_gr <- models |> makeGRangesFromDataFrame(keep.extra.columns = T)
+  models_gr <- models |> select(-is_terminal_end, -is_terminal_start) |>
+    makeGRangesFromDataFrame(keep.extra.columns = T)
 
   return(models_gr)
 }
