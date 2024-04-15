@@ -51,7 +51,17 @@ scan_motif <- function(genome, motif = "AATAAA", ...){
 
   # Apply the search function across chromosomes (example uses a subset for speed)
   # Consider parallelizing or running on a high-performance computing environment for full genomes
-  all_matches <- lapply(seqnames(genome), search_motif_both_strands) |>
+  all_matches <- lapply(seqnames(genome), search_motif_both_strands)
+
+  # remove NULL
+  all_matches <- all_matches[!sapply(all_matches, is.null)]
+
+  # unlist some that are somehow structured
+  for (i in seq_along(all_matches)) {
+    all_matches[i] <- all_matches[i] |> unlist()
+  }
+
+  all_matches <- all_matches |>
     GRangesList() |> unlist()
 
   return(all_matches)

@@ -44,8 +44,21 @@ pick_transcripts <- function(anno_priority, anno_second){
   # Filter the secondary annotations to include only non-overlapping transcripts
   anno_second_filtered <- anno_second |> filter(transcript_id %in% anno_second_transcript$transcript_id)
 
+  # add genes
+  anno_second_filtered <- c(anno_second_filtered,
+                            anno_second |> filter(type == "gene", gene_id %in% anno_second_filtered$gene_id))
+
+  # adjust genes if there are isoforms
+  anno_second_filtered <- anno_second_filtered |> adjust_transcript_gene_boundaries()
+
+  # combine the annotation
+  combined_annotations <- sort(c(anno_priority, anno_second_filtered))
+
+
   # Combine priority annotations with filtered secondary annotations and sort
   combined_annotations <- c(anno_priority, anno_second_filtered) |> sort()
 
   return(combined_annotations)
 }
+
+

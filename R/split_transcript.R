@@ -31,8 +31,7 @@ split_transcript <- function(original_annotation, liftoff, cage_peaks, min_gene_
   # remove liftoff gene models if filtering is TRUE
   # if remove_no_ORF = T
   if (remove_no_ORF == T) {
-    liftoff_orf_genes <- (liftoff |> filter(valid_ORF == "True"))$gene_id |> unique()
-    liftoff <- liftoff |> filter(gene_id %in% liftoff_orf_genes)
+    liftoff <- liftoff |> get_valid_orf_transcript()
   }
 
   # Remove liftoff gene models that do not intersect with the original annotation
