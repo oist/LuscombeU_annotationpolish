@@ -191,7 +191,7 @@ add_three_prime_utr <- function(annotation_gr, utr_motif_gr, dist = 500){
   # adjust genes based on min max of each gene
   genes <- right_join(annotation_gr |> as_tibble() |> select(-start, -end) |> filter(type == "gene"),
                       transcripts |> group_by(gene_id) |> mutate(start = min(start), end = max(end)) |>
-                        select(start, end) |> distinct()) |> mutate(transcript_id = NA)
+                        select(start, end) |> distinct()) |> mutate(transcript_id = NA) |> distinct()
 
   # adjust exons should be OK
   exon_sense <- annotation_gr |> plyranges::filter(type == "exon", strand == "+") |> dplyr::as_tibble() |>
