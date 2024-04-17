@@ -41,24 +41,34 @@ pick_transcripts <- function(anno_priority, anno_second){
   # Remove overlapping transcripts from the secondary set
   anno_second_transcript <- anno_second_transcript[-indices_to_remove]
 
-  # Filter the secondary annotations to include only non-overlapping transcripts
-  anno_second_filtered <- anno_second |> filter(transcript_id %in% anno_second_transcript$transcript_id)
+  # print the number of transcripts to complement from the second transcript set
+  message(paste("Number of transcripts to add", length(anno_second_transcript)))
 
-  # add genes
-  anno_second_filtered <- c(anno_second_filtered,
-                            anno_second |> filter(type == "gene", gene_id %in% anno_second_filtered$gene_id))
+  if (length(anno_second_transcript == 0)) {
+    message("No transcript to add! skipping function and returning original annotation set")
+    return(anno_priority)
+  }else{
+    # Filter the secondary annotations to include only non-overlapping transcripts
+    anno_second_filtered <- anno_second |> filter(transcript_id %in% anno_second_transcript$transcript_id)
 
-  # adjust genes if there are isoforms
-  anno_second_filtered <- anno_second_filtered |> adjust_transcript_gene_boundaries()
+    # add genes
+    anno_second_filtered <- c(anno_second_filtered,
+                              anno_second |> filter(type == "gene", gene_id %in% anno_second_filtered$gene_id))
 
-  # combine the annotation
-  combined_annotations <- sort(c(anno_priority, anno_second_filtered))
+    # adjust genes if there are isoforms
+    anno_second_filtered <- anno_second_filtered |> adjust_transcript_gene_boundaries()
+
+    # combine the annotation
+    combined_annotations <- sort(c(anno_priority, anno_second_filtered))
 
 
-  # Combine priority annotations with filtered secondary annotations and sort
-  combined_annotations <- c(anno_priority, anno_second_filtered) |> sort()
+    # Combine priority annotations with filtered secondary annotations and sort
+    combined_annotations <- c(anno_priority, anno_second_filtered) |> sort()
 
-  return(combined_annotations)
+    return(combined_annotations)
+  }
+
+
 }
 
 

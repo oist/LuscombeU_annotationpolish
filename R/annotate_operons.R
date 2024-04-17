@@ -150,7 +150,7 @@ summarize_operons <- function(operonic_genes){
     ) |> mutate(type = "operon") |> makeGRangesFromDataFrame(keep.extra.columns = T)
 
   # count the n of genes in operons
-  operon_summarized$n <- sapply(operons$summary$trailing, length) + 1
+  operon_summarized$n <- sapply(operon_summarized$trailing, length) + 1
 
   return(list(summary = operon_summarized, gene_details = operonic_genes_labeled))
 }
