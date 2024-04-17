@@ -74,7 +74,7 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   # adjust genes
   genes <- right_join(annotation_gr |> as_tibble() |> select(-start, -end) |> filter(type == "gene"),
                       transcripts |> group_by(gene_id) |> mutate(start = min(start), end = max(end)) |>
-                        select(start, end) |> distinct())
+                        select(start, end) |> distinct()) |> mutate(transcript_id = NA)
 
   # adjust exons
   exon_sense <- annotation_gr |> plyranges::filter(type == "exon", strand == "+") |> dplyr::as_tibble() |>
