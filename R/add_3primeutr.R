@@ -256,6 +256,9 @@ add_three_prime_utr <- function(annotation_gr, utr_motif_gr, dist = 500){
   # fix stupid bug where Parent of three prime UTR is not transcript ID
   final_gr$Parent[final_gr$type == "three_prime_UTR"] <- final_gr$transcript_id[final_gr$type == "three_prime_UTR"]
 
+  # re assign ID
+  final_gr <- add_unique_id(final_gr)
+
   return(final_gr)
 }
 
