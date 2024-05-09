@@ -123,6 +123,12 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   # fix stupid bug where Parent of five prime UTR is not transcript ID
   final_gr$Parent[final_gr$type == "five_prime_UTR"] <- final_gr$transcript_id[final_gr$type == "five_prime_UTR"]
 
+  # just another patch because gene generated is doubled and has to be readjusted
+  final_gr <- final_gr |> adjust_transcript_gene_boundaries()
+  final_gr <- c(final_gr |> plyranges::filter(type == "gene") |> unique(),
+                final_gr |> plyranges::filter(type != "gene")) |> sort()
+
+
   return(final_gr)
 }
 
