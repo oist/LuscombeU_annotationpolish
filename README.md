@@ -10,6 +10,8 @@ R package for annotation polishing. This package can perform the following on ba
 6. Fix liftoff gff files previously fixed wrongly by AGAT (`fix_liftoff_oikobase()`)
 7. Prioritize one transcript model over another (`pick_transcripts()`)
 8. Split chimeric transcripts based on CAGE and liftoff (`split_transcripts()`)
+9. Assign transcript_id and gene_id when there is only ID and Parent (`assign_IDs_from_ParentandID()`)
+10. Rename Name based on grouping of gene_id (`rename_Name_based_on_gene_id()`)
 
 
 ## Installation
