@@ -100,14 +100,29 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   all_features <- bind_rows(exons, other_features) |> ungroup()
 
   # combine everything together again
+  # remove type == "gene"
   granges_with_5utr <- bind_rows(transcripts, genes, five_prime_utr, all_features) |>
     select(seqnames, start, end, width, strand, source, type, score, phase, gene_id, transcript_id, Parent, tss_type) |>
     makeGRangesFromDataFrame(keep.extra.columns = T)
 
+  granges_with_5utr <- granges_with_5utr |> filter(type != "gene")
+
+  granges_without_5utr <- annotation_gr |> plyranges::filter(!transcript_id %in% granges_with_5utr$transcript_id) |> filter(type != "gene")
+
+  # this new granges does not contain gene entry
+  combined_gr <- c(granges_with_5utr, granges_without_5utr)
+
+  # make gene entries
+  # gene entries has to be recreated based on the transcripts
+  genes <- combined_gr |> as_tibble() |> select(seqnames, start, end, width, strand, source, gene_id) |>
+    group_by(gene_id) |> mutate(start = min(start), end = max(end)) |> distinct() |>
+    ungroup() |> mutate(Parent = NA, type = "gene") |> makeGRangesFromDataFrame(keep.extra.columns = T) |> unique()
+
   # combine eveerything and sort
-  final_gr <- c(granges_with_5utr, annotation_gr |> plyranges::filter(!transcript_id %in% granges_with_5utr$transcript_id)) |>
+  final_gr <- c(combined_gr, genes) |>
     plyranges::select(-ID) |>
     sort()
+
 
   # unlist Parent and remove_transcript_id if gene
   mcols(final_gr)$Parent <- sapply(mcols(final_gr)$Parent, function(x) {
@@ -117,6 +132,7 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
       return(x[[1]])
     }
   })
+
 
   final_gr$transcript_id[final_gr$type == "gene"] <- NA
 
@@ -128,6 +144,7 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   final_gr <- c(final_gr |> plyranges::filter(type == "gene") |> unique(),
                 final_gr |> plyranges::filter(type != "gene")) |> sort()
 
+  final_gr
 
   return(final_gr)
 }
