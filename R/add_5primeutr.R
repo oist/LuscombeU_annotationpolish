@@ -116,7 +116,8 @@ add_five_prime_utr <- function(annotation_gr, cage_peaks, dist = 500){
   # gene entries has to be recreated based on the transcripts
   genes <- combined_gr |> as_tibble() |> select(seqnames, start, end, width, strand, source, gene_id) |>
     group_by(gene_id) |> mutate(start = min(start), end = max(end)) |> distinct() |>
-    ungroup() |> mutate(Parent = NA, type = "gene") |> makeGRangesFromDataFrame(keep.extra.columns = T) |> unique()
+    ungroup() |> mutate(Parent = NA, type = "gene") |> makeGRangesFromDataFrame(keep.extra.columns = T) |> unique() |>
+    mutate(score = NA)
 
   # combine eveerything and sort
   final_gr <- c(combined_gr, genes) |>
